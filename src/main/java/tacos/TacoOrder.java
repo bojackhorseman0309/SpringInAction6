@@ -1,56 +1,76 @@
 package tacos;
-
-import lombok.Data;
-import org.hibernate.validator.constraints.CreditCardNumber;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.CreditCardNumber;
+
+import lombok.Data;
+
 @Data
-@Document
+@Entity
+@Table(name="Taco_Order")
 public class TacoOrder implements Serializable {
 
-    private static final long serialVersionUID = 3063245355204488797L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    private String id;
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  private Long id;
 
-    private Date placedAt = new Date();
+  private Date placedAt;
 
-    @NotBlank(message = "Delivery name is required")
-    private String deliveryName;
+  @ManyToOne
+  private User user;
 
-    @NotBlank(message = "Street is required")
-    private String deliveryStreet;
+  @NotBlank(message="Delivery name is required")
+  private String deliveryName;
 
-    @NotBlank(message = "City is required")
-    private String deliveryCity;
+  @NotBlank(message="Street is required")
+  private String deliveryStreet;
 
-    @NotBlank(message = "State is required")
-    private String deliveryState;
+  @NotBlank(message="City is required")
+  private String deliveryCity;
 
-    @NotBlank(message = "Zip code is required")
-    private String deliveryZip;
+  @NotBlank(message="State is required")
+  private String deliveryState;
 
-    @CreditCardNumber(message = "Not a valid credit card number")
-    private String ccNumber;
+  @NotBlank(message="Zip code is required")
+  private String deliveryZip;
 
-    @Pattern(regexp = "^(0[1-9]|1[0-2])([\\/])([2-9][0-9])$")
-    private String ccExpiration;
+  @CreditCardNumber(message="Not a valid credit card number")
+  private String ccNumber;
 
-    @Digits(integer = 3, fraction = 0, message = "Invalid CVV")
-    private String ccCVV;
+  @Pattern(regexp="^(0[1-9]|1[0-2])([\\/])([2-9][0-9])$",
+           message="Must be formatted MM/YY")
+  private String ccExpiration;
 
-    private List<Taco> tacos = new ArrayList<>();
+  @Digits(integer=3, fraction=0, message="Invalid CVV")
+  private String ccCVV;
 
-    public void addTaco(Taco taco) {
-        this.tacos.add(taco);
-    }
+  @ManyToMany(targetEntity=Taco.class)
+  private List<Taco> tacos = new ArrayList<>();
+
+  public void addTaco(Taco design) {
+    this.tacos.add(design);
+  }
+
+  @PrePersist
+  void placedAt() {
+    this.placedAt = new Date();
+  }
+
 }
