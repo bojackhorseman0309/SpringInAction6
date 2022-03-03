@@ -2,9 +2,9 @@ spring:
   datasource:
     generate-unique-name: false
     name: tacocloud
-#  profiles:
-#    active:
-#      - prod better as env variable: export SPRING_PROFILES_ACTIVE=prod
+  data:
+    rest:
+      base-path: /data-api
 
 taco:
   orders:
@@ -13,17 +13,3 @@ taco:
 logging:
   level:
     tacos: DEBUG
-
-
-#---
-#spring:
-#  profiles: prod
-#
-#  datasource:
-#    url: jdbc:mysql:/ /localhost/tacocloud
-#    username: tacouser
-#    password: tacopassword
-#
-#  logging:
-#    level:
-#      tacos: WARN
