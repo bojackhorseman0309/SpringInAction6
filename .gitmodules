@@ -1,0 +1,3 @@
+[submodule "spring-in-action-6-samples"]
+	path = spring-in-action-6-samples
+	url = https://github.com/habuma/spring-in-action-6-samples.git
