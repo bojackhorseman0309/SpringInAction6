@@ -1,22 +1,21 @@
 package tacos.security;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -27,16 +26,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS).permitAll() // needed for Angular/CORS
-                .antMatchers(HttpMethod.POST, "/api/ingredients")
-                .hasAuthority("SCOPE_writeIngredients")
-                .antMatchers(HttpMethod.DELETE, "/api/ingredients")
-                .hasAuthority("SCOPE_deleteIngredients")
+                .antMatchers(HttpMethod.POST, "/api/ingredients").permitAll()
                 .antMatchers("/api/tacos", "/api/orders/**")
                 .permitAll()
+                //.access("hasRole('USER')")
+                .antMatchers(HttpMethod.PATCH, "/api/ingredients").permitAll()
                 .antMatchers("/**").access("permitAll")
-                .and()
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt())
 
+                .and()
+                .formLogin()
+                .loginPage("/login")
+
+                .and()
                 .httpBasic()
                 .realmName("Taco Cloud")
 
@@ -58,8 +59,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
+//    return new StandardPasswordEncoder("53cr3t");
+        return NoOpPasswordEncoder.getInstance();
     }
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)
@@ -72,3 +75,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 }
+

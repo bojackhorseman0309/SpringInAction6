@@ -5,11 +5,9 @@ spring:
   data:
     rest:
       base-path: /data-api
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:9010/oauth2/jwks
+  jms:
+    template:
+      default-destination: tacocloud.order.queue
 
 taco:
   orders:
